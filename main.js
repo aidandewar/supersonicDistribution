@@ -5,9 +5,9 @@ const {
   webContents,
   Notification,
   screen,
-  remote,
+  remote
 } = require("electron");
-const { app, autoUpdater } = require("electron");
+const {autoUpdater} = require('electron-updater');
 const nativeImage = require("electron").nativeImage;
 const path = require("path");
 
@@ -20,15 +20,15 @@ const { ipcMain } = require("electron");
 const { create } = require("domain");
 
 //set up auto-updating:
-const server = "https://update.electronjs.org";
-const feed = `${server}/14perkinss/supersonicDist/${process.platform}-${
-  process.arch
-}/${app.getVersion()}`;
-autoUpdater.setFeedURL(feed);
+// const server = "https://update.electronjs.org";
+// const feed = `${server}/aidandewar/supersonicDistribution/${process.platform}-${
+//   process.arch
+// }/${app.getVersion()}`;
+// autoUpdater.setFeedURL(feed);
 
-setInterval(() => {
-  autoUpdater.checkForUpdates();
-}, 10 * 60 * 1000);
+// setInterval(() => {
+//   autoUpdater.checkForUpdates();
+// }, 10 * 60 * 1000);
 
 function createWindow() {
   // Create the browser window.
@@ -60,6 +60,7 @@ function createWindow() {
 // let win = null;
 app.whenReady().then(() => {
   createWindow();
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
 // Quit when all windows are closed.
@@ -79,6 +80,8 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+// TODO: UNCOMMENT EVERYTHING ABOVE THIS LINE
 
 // const { app, BrowserWindow, ipcMain, autoUpdater } = require("electron");
 // // const { autoUpdater } = require("electron-updater");
@@ -106,6 +109,7 @@ app.on("activate", () => {
 
 // app.on("ready", () => {
 //   createWindow();
+//   autoUpdater.checkForUpdatesAndNotify();
 // });
 
 // app.on("window-all-closed", function () {
@@ -138,3 +142,64 @@ app.on("activate", () => {
 // // ipcMain.on("restart_app", () => {
 // //   autoUpdater.quitAndInstall();
 // // });
+
+
+
+
+// //-------------------------------------------------------------------
+// // Define the menu
+// //
+// // THIS SECTION IS NOT REQUIRED
+// //-------------------------------------------------------------------
+// let template = []
+// if (process.platform === 'darwin') {
+//   // OS X
+//   const name = app.getName();
+//   template.unshift({
+//     label: name,
+//     submenu: [
+//       {
+//         label: 'About ' + name,
+//         role: 'about'
+//       },
+//       {
+//         label: 'Quit',
+//         accelerator: 'Command+Q',
+//         click() { app.quit(); }
+//       },
+//     ]
+//   })
+// }
+
+
+// autoUpdater.on('checking-for-update', () => {
+//   sendStatusToWindow('Checking for update...');
+// })
+// autoUpdater.on('update-available', (info) => {
+//   sendStatusToWindow('Update available.');
+// })
+// autoUpdater.on('update-not-available', (info) => {
+//   sendStatusToWindow('Update not available.');
+// })
+// autoUpdater.on('error', (err) => {
+//   sendStatusToWindow('Error in auto-updater. ' + err);
+// })
+// autoUpdater.on('download-progress', (progressObj) => {
+//   let log_message = "Download speed: " + progressObj.bytesPerSecond;
+//   log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+//   log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+//   sendStatusToWindow(log_message);
+// })
+// autoUpdater.on('update-downloaded', (info) => {
+//   sendStatusToWindow('Update downloaded');
+// });
+// app.on('ready', function() {
+//   // Create the Menu
+//   const menu = Menu.buildFromTemplate(template);
+//   Menu.setApplicationMenu(menu);
+
+//   createDefaultWindow();
+// });
+// app.on('window-all-closed', () => {
+//   app.quit();
+// });
