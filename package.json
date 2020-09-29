@@ -1,0 +1,106 @@
+{
+  "name": "supersonic",
+  "version": "1.0.1",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-updater": "^4.3.5",
+    "update-electron-app": "^1.5.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.53",
+    "@electron-forge/maker-deb": "^6.0.0-beta.53",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.53",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.53",
+    "@electron-forge/maker-zip": "^6.0.0-beta.53",
+    "electron": "^10.1.2",
+    "electron-builder": "^22.8.1",
+    "electron-notarize": "^1.0.0",
+    "node": "^14.12.0"
+  },
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder -mwl"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aidandewar/supersonicDistribution.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aidandewar/supersonicDistribution/issues"
+  },
+  "homepage": "https://github.com/aidandewar/supersonicDistribution#readme",
+  "build": {
+    "appId": "supersonic",
+    "files": [
+      "!**/node_modules/*"
+    ],
+    "afterSign": "notarize.js",
+    "mac": {
+      "category": "productivity",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "entitlements.plist",
+      "entitlementsInherit": "entitlements.plist"
+    },
+    "win": {
+      "icon": "icons/icon.png",
+      "target": [
+        "portable"
+      ]
+    },
+    "linux": {
+      "icon": "icons/icon.png",
+      "target": [
+        "pacman"
+      ]
+    },
+    "dmg": {
+      "sign": false
+    }
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "icons.icns",
+        "osxSign": {
+          "identity": "Developer ID Application: David Perkins (R59Y7K536G)",
+          "hardened-runtime": true,
+          "entitlements": "entitlements.plist",
+          "entitlements-inherit": "entitlements.plist",
+          "signature-flags": "library",
+          "gatekeeper-assess": false
+        }
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "supersonic"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  }
+}
