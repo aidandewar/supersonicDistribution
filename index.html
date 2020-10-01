@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-  <title>Electron Auto Update Example</title>
+  <title>Electron Auto Update Example vUpdated</title>
   <style>
     body {
       box-sizing: border-box;
@@ -28,6 +28,13 @@
 <body>
   <h1>Electron Auto Update Example</h1>
   <p id="version"></p>
+  <div id="notification" class="hidden">
+    <p id="message"></p>
+    <button id="close-button" onClick="closeNotification()">Close</button>
+    <button id="restart-button" onClick="restartApp()" class="hidden">
+      Restart
+    </button>
+  </div>
   <script>
     const { ipcRenderer } = require("electron");
     const version = document.getElementById("version");
@@ -60,11 +67,4 @@
       ipcRenderer.send("restart_app");
     }
   </script>
-  <div id="notification" class="hidden">
-    <p id="message"></p>
-    <button id="close-button" onClick="closeNotification()">Close</button>
-    <button id="restart-button" onClick="restartApp()" class="hidden">
-      Restart
-    </button>
-  </div>
 </body>

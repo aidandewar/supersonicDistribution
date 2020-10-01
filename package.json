@@ -1,7 +1,7 @@
 {
   "name": "supersonic",
-  "version": "1.1.8",
-  "description": "",
+  "version": "2.0.0",
+  "description": "live voice channels for remote teams",
   "main": "main.js",
   "dependencies": {
     "dotenv": "^8.2.0",
@@ -22,12 +22,12 @@
     "node": "^14.12.0"
   },
   "scripts": {
-    "start": "electron-forge start",
+    "start": "electron .",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder -mw",
-    "publish": "electron-builder -mw -p always"
+    "dist": "electron-builder -m",
+    "publish": "electron-builder -m -p always"
   },
   "repository": {
     "type": "git",
@@ -63,10 +63,14 @@
         "dmg"
       ]
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
     "win": {
       "icon": "icons/icon_256@1x.png.png",
       "target": [
-        "portable"
+        "nsis"
       ]
     },
     "linux": {
