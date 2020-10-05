@@ -1,11 +1,12 @@
 {
   "name": "supersonic",
-  "version": "2.0.0",
+  "version": "2.2.14",
   "description": "live voice channels for remote teams",
   "main": "main.js",
   "dependencies": {
     "dotenv": "^8.2.0",
     "electron-log": "^4.2.4",
+    "electron-logger": "0.0.3",
     "electron-squirrel-startup": "^1.0.0",
     "electron-updater": "^4.3.5",
     "update-electron-app": "^1.5.0"
@@ -23,11 +24,10 @@
   },
   "scripts": {
     "start": "electron .",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder -m",
-    "publish": "electron-builder -m -p always"
+    "pack:mac": "electron-builder -m --dir -c.mac.identity=null",
+    "dist": "electron-builder",
+    "publish:win": "export CSC_LINK=file://certificate.pfx; read -s -p \"Certificate Password: \" certPassword; export CSC_KEY_PASSWORD=\"$certPassword\"; electron-builder -w -p always",
+    "publish:mac": "electron-builder -m -p always"
   },
   "repository": {
     "type": "git",
@@ -63,15 +63,8 @@
         "dmg"
       ]
     },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
-    },
     "win": {
-      "icon": "icons/icon_256@1x.png.png",
-      "target": [
-        "nsis"
-      ]
+      "icon": "icons/icon_256@1x.png.png"
     },
     "linux": {
       "icon": "icons/icon_256@1x.png.png",
