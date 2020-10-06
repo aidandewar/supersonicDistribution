@@ -18,6 +18,9 @@ var image = nativeImage.createFromPath(__dirname + "/icons/icon_512@1x.png");
 image.setTemplateImage(true);
 const ipc = require("electron").ipcMain;
 const { ipcMain } = require("electron");
+const debug = require("electron-debug");
+debug();
+
 //Set up analytics
 const { trackEvent } = require("./analytics");
 var quitting = false;
@@ -29,6 +32,13 @@ autoUpdater.logger.transports.file.level = "info";
 autoUpdater.allowPrerelease = true;
 // autoUpdater.autoInstallOnAppQuit = true;
 log.info("App starting...");
+
+console.log = function (message) {
+  log.info(message);
+};
+console.error = function (message) {
+  log.error(message);
+};
 
 autoUpdater.on("checking-for-update", () => {
   log.info("Checking for update...");
@@ -142,28 +152,35 @@ app.on("before-quit", () => {
 
 // Create the browser window.
 function createWindow() {
+  log.info("createWindow function starting");
   win = new BrowserWindow({
     width: 350,
     height: 600,
     minHeight: 250,
     minWidth: 200,
-    frame: false,
     titleBarStyle: "hiddenInset",
     webPreferences: { nodeIntegration: true, enableRemoteModule: true },
     icon: image,
   });
+  log.info("window created");
   win.setMenuBarVisibility(false);
-
+  log.info("setMenuBarVisibility to false");
   //Set position of the main window
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const calcWidth = (width * 3) / 4 - 175;
-  const calcHeight = height - 700;
-  win.setPosition(calcWidth, calcHeight);
+  // const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  // log.info("Got width and height of screen");
+  // const calcWidth = (width * 3) / 4 - 175;
+  // log.info("Calculated width");
+  // const calcHeight = height - 700;
+  // log.info("Calculated height");
+  // // win.setPosition(calcWidth, calcHeight);
+  // log.info("Set position");
   // and load the index.html of the app.
   win.loadURL("https://knockknockchat-a47de.web.app/", { userAgent: "Chrome" });
+  log.info("Loaded URL");
 
   //TODO: Solve max listeners bug
   process.setMaxListeners(0);
+  log.info("Set listeners");
 
   // On close, hide instead of close
   win.on("close", (event) => {
@@ -173,7 +190,8 @@ function createWindow() {
       win.hide();
     }
   });
-
+  log.info("Set on close function");
+  log.info("Now returning window");
   return win;
 }
 
@@ -201,10 +219,10 @@ function createRoomModal() {
   });
 
   modal.on("close", function (e) {
+    mainWindow.webContents.send("refresh", "Modal closed");
     globalShortcut.unregisterAll();
   });
   return modal;
 }
 
 //TODO: Develop custom menu
-//TODO: Prevent going offline unless app is quit
