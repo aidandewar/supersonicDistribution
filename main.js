@@ -18,6 +18,47 @@ var image = nativeImage.createFromPath(__dirname + "/icons/icon_512@1x.png");
 image.setTemplateImage(true);
 const ipc = require("electron").ipcMain;
 const { ipcMain } = require("electron");
+//Set up analytics
+const { trackEvent } = require("./analytics");
+var quitting = false;
+
+//Logger for autoupdater testing
+const log = require("electron-log");
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = "info";
+autoUpdater.allowPrerelease = true;
+// autoUpdater.autoInstallOnAppQuit = true;
+log.info("App starting...");
+
+autoUpdater.on("checking-for-update", () => {
+  log.info("Checking for update...");
+});
+autoUpdater.on("update-available", (info) => {
+  log.info("Update available.");
+});
+autoUpdater.on("update-not-available", (info) => {
+  log.info("Update not available.");
+});
+autoUpdater.on("error", (err) => {
+  log.info("Error in auto-updater. " + err);
+});
+autoUpdater.on("download-progress", (progressObj) => {
+  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  log_message = log_message + " - Downloaded " + progressObj.percent + "%";
+  log_message =
+    log_message +
+    " (" +
+    progressObj.transferred +
+    "/" +
+    progressObj.total +
+    ")";
+  log.info(log_message);
+});
+
+autoUpdater.on("update-downloaded", () => {
+  log.info("Update downloading...beginning install");
+  autoUpdater.quitAndInstall(false, true);
+});
 
 var modalOpen = false;
 var mainWindow;
@@ -31,31 +72,9 @@ ipcMain.handle("load room modal", async (e, ...roomName) => {
       allWindows[i].close();
     }
   }
-  // let existingModal = BrowserWindow.fromId(2);
-  // if (existingModal) {
-  //   console.log('closingWindow!');
-  //   existingModal.close();
-  // }
 
   //Create the new modal
   var modalWindow = createRoomModal();
-
-  // modalWindow.on('focus', event => {
-  //   console.log('showing main window!');
-  //   event.preventDefault();
-  //   mainWindow.show();
-  // });
-
-  // modalWindow.on('close', function(e) {
-  //   e.preventDefault();
-  //   // modalWindow.hide();
-  //   mainWindow.focus();
-  // });
-
-  // modalWindow.on('focus', function(e) {
-  //   console.log('focused!');
-  //   modalWindow.setSize(width - 350, 400, true);
-  // });
 
   let url =
     "https://knockknockchat-a47de.web.app/room/" +
@@ -72,13 +91,32 @@ ipcMain.handle("close room modal", (e) => {
   BrowserWindow.getFocusedWindow().close();
 });
 
+//When someone knocks, load modal to knock request page
+ipcMain.handle("load knock modal", async (e, ...knocker) => {
+  let allWindows = BrowserWindow.getAllWindows();
+  for (i = 0; i < allWindows.length; i++) {
+    if (allWindows[i].id > 1) {
+      allWindows[i].close();
+    }
+  }
+
+  //Create the new modal
+  var modalWindow = createRoomModal();
+
+  let url = "https://knockknockchat-a47de.web.app/knock/" + knocker;
+  modalWindow.loadURL(url);
+  modalWindow.show();
+  console.log("ID of Modal: " + modalWindow.id);
+});
+
 app.whenReady().then(() => {
   mainWindow = createWindow();
   console.log("ID of Main: " + mainWindow.id);
+  // trackEvent("User Interaction", "Opened App");
   autoUpdater.checkForUpdatesAndNotify();
 });
 
-app.on("window-all-closed", (e) => e.preventDefault());
+// app.on("window-all-closed", (e) => e.preventDefault());
 
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
@@ -98,6 +136,10 @@ app.on("activate", () => {
   }
 });
 
+app.on("before-quit", () => {
+  quitting = true;
+});
+
 // Create the browser window.
 function createWindow() {
   win = new BrowserWindow({
@@ -105,6 +147,7 @@ function createWindow() {
     height: 600,
     minHeight: 250,
     minWidth: 200,
+    frame: false,
     titleBarStyle: "hiddenInset",
     webPreferences: { nodeIntegration: true, enableRemoteModule: true },
     icon: image,
@@ -113,8 +156,9 @@ function createWindow() {
 
   //Set position of the main window
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  win.setPosition(width - 350, 275);
-
+  const calcWidth = (width * 3) / 4 - 175;
+  const calcHeight = height - 700;
+  win.setPosition(calcWidth, calcHeight);
   // and load the index.html of the app.
   win.loadURL("https://knockknockchat-a47de.web.app/", { userAgent: "Chrome" });
 
@@ -123,9 +167,11 @@ function createWindow() {
 
   // On close, hide instead of close
   win.on("close", (event) => {
-    console.log(event);
-    event.preventDefault();
-    win.hide();
+    if (!quitting) {
+      console.log(event);
+      event.preventDefault();
+      win.hide();
+    }
   });
 
   return win;
@@ -153,11 +199,12 @@ function createRoomModal() {
   globalShortcut.register("CommandOrControl+Shift+L", () => {
     modal.close();
   });
+
+  modal.on("close", function (e) {
+    globalShortcut.unregisterAll();
+  });
   return modal;
 }
 
 //TODO: Develop custom menu
-//TODO: Prevent force quit when modal is closed
-//TODO: Add custom shortcuts
-//TODO: Translate mute hotkey to modal
 //TODO: Prevent going offline unless app is quit

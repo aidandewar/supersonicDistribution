@@ -2,3 +2,4 @@ node_modules/
 .env
 electron-builder.yml
 dist/
+certificate.pfx
