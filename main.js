@@ -18,38 +18,29 @@ var image = nativeImage.createFromPath(__dirname + "/icons/icon_512@1x.png");
 image.setTemplateImage(true);
 const ipc = require("electron").ipcMain;
 const { ipcMain } = require("electron");
-
+//Set up analytics
+const { trackEvent } = require("./analytics");
 var quitting = false;
 
 //Logger for autoupdater testing
 const log = require("electron-log");
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = "info";
+autoUpdater.allowPrerelease = true;
 // autoUpdater.autoInstallOnAppQuit = true;
 log.info("App starting...");
 
-const updateCheck = () => {
-  autoUpdater.checkForUpdatesAndNotify().then((resp) => {
-    log.info("autoUpdate response:");
-    log.info(resp);
-  });
-};
-
-function sendStatusToWindow(text) {
-  log.info(text);
-}
-
 autoUpdater.on("checking-for-update", () => {
-  sendStatusToWindow("Checking for update...");
+  log.info("Checking for update...");
 });
 autoUpdater.on("update-available", (info) => {
-  sendStatusToWindow("Update available.");
+  log.info("Update available.");
 });
 autoUpdater.on("update-not-available", (info) => {
-  sendStatusToWindow("Update not available.");
+  log.info("Update not available.");
 });
 autoUpdater.on("error", (err) => {
-  sendStatusToWindow("Error in auto-updater. " + err);
+  log.info("Error in auto-updater. " + err);
 });
 autoUpdater.on("download-progress", (progressObj) => {
   let log_message = "Download speed: " + progressObj.bytesPerSecond;
@@ -61,32 +52,12 @@ autoUpdater.on("download-progress", (progressObj) => {
     "/" +
     progressObj.total +
     ")";
-  sendStatusToWindow(log_message);
+  log.info(log_message);
 });
 
-app.on("ready", async () => {
-  autoUpdater.on("update-downloaded", () => {
-    log.info("update downloaded");
-    setImmediate(() => {
-      try {
-        log.info("installing update");
-        // app.relaunch();
-        autoUpdater.quitAndInstall();
-      } catch (err) {
-        log.error("Error installing update");
-        log.error(err);
-      }
-    });
-  });
-
-  autoUpdater.on("error", (err) => {
-    log.error("AutoUpdater error");
-    log.error(err);
-  });
-
-  updateCheck();
-
-  schedule.scheduleJob("*/10 * * * *", updateCheck);
+autoUpdater.on("update-downloaded", () => {
+  log.info("Update downloading...beginning install");
+  autoUpdater.quitAndInstall(false, true);
 });
 
 var modalOpen = false;
@@ -141,7 +112,8 @@ ipcMain.handle("load knock modal", async (e, ...knocker) => {
 app.whenReady().then(() => {
   mainWindow = createWindow();
   console.log("ID of Main: " + mainWindow.id);
-  // autoUpdater.checkForUpdatesAndNotify();
+  // trackEvent("User Interaction", "Opened App");
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
 // app.on("window-all-closed", (e) => e.preventDefault());

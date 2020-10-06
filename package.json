@@ -1,6 +1,6 @@
 {
   "name": "supersonic",
-  "version": "2.2.14",
+  "version": "0.0.1",
   "description": "live voice channels for remote teams",
   "main": "main.js",
   "dependencies": {
@@ -9,6 +9,8 @@
     "electron-logger": "0.0.3",
     "electron-squirrel-startup": "^1.0.0",
     "electron-updater": "^4.3.5",
+    "node-localstorage": "^2.1.6",
+    "universal-analytics": "^0.4.23",
     "update-electron-app": "^1.5.0"
   },
   "devDependencies": {
