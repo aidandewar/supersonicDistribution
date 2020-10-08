@@ -1,6 +1,6 @@
 {
   "name": "supersonic",
-  "version": "3.0.0",
+  "version": "3.0.3",
   "description": "live voice channels for remote teams",
   "main": "main.js",
   "dependencies": {

@@ -159,6 +159,7 @@ function createWindow() {
     minHeight: 250,
     minWidth: 200,
     titleBarStyle: "hiddenInset",
+    frame: false,
     webPreferences: { nodeIntegration: true, enableRemoteModule: true },
     icon: image,
   });
@@ -210,7 +211,7 @@ function createRoomModal() {
   modal.setPosition(width - 250, 0);
   //add hotkey for mute (cmd+shft+m)
   globalShortcut.register("CommandOrControl+Shift+M", () => {
-    modal.webContents.send("message", "Hello second window!");
+    modal.webContents.send("toggleMute", "Hello second window!");
   });
 
   //add hotkey for leave room (cmd+shft+L)
