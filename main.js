@@ -141,7 +141,7 @@ app.on("activate", () => {
   // On macOS it's common to re-create a window in the
   // app when the dock icon is clicked and there are no
   // other windows open.
-  if (BrowserWindow.getAllWindows().length === 1) {
+  if (BrowserWindow.getAllWindows().length >= 1) {
     mainWindow.show();
   }
 });
@@ -211,18 +211,29 @@ function createRoomModal() {
   modal.setPosition(width - 250, 0);
   //add hotkey for mute (cmd+shft+m)
   globalShortcut.register("CommandOrControl+Shift+M", () => {
+    log.info("mute hotkey detected!");
     modal.webContents.send("toggleMute", "Hello second window!");
   });
 
   //add hotkey for leave room (cmd+shft+L)
   globalShortcut.register("CommandOrControl+Shift+L", () => {
+    log.info("Leave room hotkey detected!");
     modal.close();
   });
 
+  const interval = setInterval(function () {
+    if (powerMonitor.getSystemIdleState(1800) == "idle") {
+      clearInterval(interval);
+      modal.close();
+    }
+  }, 60000);
+
   modal.on("close", function (e) {
     mainWindow.webContents.send("refresh", "Modal closed");
+    mainWindow.webContents.send("leftRoom", "modal closed");
     globalShortcut.unregisterAll();
   });
+
   return modal;
 }
 
