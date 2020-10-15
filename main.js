@@ -8,6 +8,7 @@ const {
   remote,
   Menu,
   MenuItem,
+  powerMonitor,
 } = require("electron");
 // const { PanelWindow } = require('electron-panel-window');
 const { autoUpdater } = require("electron-updater");
@@ -69,6 +70,12 @@ autoUpdater.on("update-downloaded", () => {
   log.info("Update downloading...beginning install");
   autoUpdater.quitAndInstall(false, true);
 });
+
+// Disable error dialogs by overriding
+dialog.showErrorBox = function (title, content) {
+  console.log(`${title}\n${content}`);
+  log.info(`${title}\n${content}`);
+};
 
 var modalOpen = false;
 var mainWindow;
