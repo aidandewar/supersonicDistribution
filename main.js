@@ -79,7 +79,7 @@ dialog.showErrorBox = function (title, content) {
 
 var modalOpen = false;
 var mainWindow;
-// var modalWindow;
+var modalWindow;
 
 ipcMain.handle("load room modal", async (e, ...roomName) => {
   //if there's already a modal open, close it
@@ -91,7 +91,7 @@ ipcMain.handle("load room modal", async (e, ...roomName) => {
   }
 
   //Create the new modal
-  var modalWindow = createRoomModal();
+  modalWindow = createRoomModal();
 
   let url =
     "https://knockknockchat-a47de.web.app/room/" +
@@ -118,7 +118,7 @@ ipcMain.handle("load knock modal", async (e, ...knocker) => {
   }
 
   //Create the new modal
-  var modalWindow = createRoomModal();
+  modalWindow = createRoomModal();
 
   let url = "https://knockknockchat-a47de.web.app/knock/" + knocker;
   modalWindow.loadURL(url);
@@ -207,16 +207,17 @@ function createWindow() {
 function createRoomModal() {
   const modal = new BrowserWindow({
     width: 175,
-    height: 250,
+    height: 125,
     frame: false,
+    hasShadow: true,
+    resizable: true,
     show: false,
     webPreferences: { nodeIntegration: true, enableRemoteModule: true },
-    transparent: true,
+    transparent: false,
     alwaysOnTop: true,
   });
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  modal.setPosition(width - 250, 0);
-  //add hotkey for mute (cmd+shft+m)
+  modal.setPosition(width - 190, 25); //add hotkey for mute (cmd+shft+m)
   globalShortcut.register("CommandOrControl+Shift+M", () => {
     log.info("mute hotkey detected!");
     modal.webContents.send("toggleMute", "Hello second window!");
