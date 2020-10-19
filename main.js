@@ -108,6 +108,10 @@ ipcMain.handle("close room modal", (e) => {
   BrowserWindow.getFocusedWindow().close();
 });
 
+ipcMain.handle('logout modal', e => {
+  modalWindow.close();
+});
+
 //When someone knocks, load modal to knock request page
 ipcMain.handle("load knock modal", async (e, ...knocker) => {
   let allWindows = BrowserWindow.getAllWindows();
