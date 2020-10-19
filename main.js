@@ -81,6 +81,15 @@ var modalOpen = false;
 var mainWindow;
 var modalWindow;
 
+ipcMain.handle("resize modal", async (e, ...peerCount) => {
+  let baseHeight = 125;
+  console.log("peers: " + peerCount);
+  let rowHeight = 35;
+  let height = baseHeight + rowHeight * peerCount;
+  let currentSize = modalWindow.getSize();
+  modalWindow.setSize(currentSize[0], height, true);
+});
+
 ipcMain.handle("load room modal", async (e, ...roomName) => {
   //if there's already a modal open, close it
   let allWindows = BrowserWindow.getAllWindows();
@@ -108,7 +117,7 @@ ipcMain.handle("close room modal", (e) => {
   BrowserWindow.getFocusedWindow().close();
 });
 
-ipcMain.handle('logout modal', e => {
+ipcMain.handle("logout modal", (e) => {
   modalWindow.close();
 });
 
